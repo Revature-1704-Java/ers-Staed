@@ -26,13 +26,11 @@ public class EmployeeDAO extends DAO {
 	}
 	
 	public Employee employeeLogin(String user, String pass) {
-		//System.out.println("User: " + user + ", Pass: " + pass);
-		
 		String sql = "SELECT * FROM EMPLOYEE WHERE USERNAME = ? AND PASS = ?";
 		PreparedStatement ps = prepareStatement(sql);
 		try {
 			ps.setString(1, user);
-			ps.setString(2,  pass);
+			ps.setString(2, pass);
 		} catch (SQLException e) {
 			e.getMessage();
 		}
@@ -61,7 +59,6 @@ public class EmployeeDAO extends DAO {
 			if (rs.getInt("ISMANAGER") > 0)
 				isMgr = true;
 
-			// TODO: Not recognizing manager
 			if (isMgr)
 				emp = ef.getManager(eId, fName, lName, uname);
 			else

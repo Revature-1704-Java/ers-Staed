@@ -19,17 +19,12 @@ public abstract class DAO {
 	/**
 	 * Creates the SQL connection and prepares the SQL query
 	 * @param sql - The SQL query desired
-	 * @return A Object extending Statement of that SQL query
+	 * @return A PreparedStatement of that SQL Query
 	 */
-	@SuppressWarnings("unchecked")
-	private <T> T prepare(String sql, Class<T> type) {
+	PreparedStatement prepareStatement(String sql) {
 		Connection conn = ConnectionUtil.getConnection();
 		try {
-			if (type == CallableStatement.class)
-				return (T) conn.prepareCall(sql);
-			else if (type == PreparedStatement.class);
-				return (T) conn.prepareStatement(sql);
-				
+			return conn.prepareStatement(sql);	
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -39,19 +34,16 @@ public abstract class DAO {
 	/**
 	 * Creates the SQL connection and prepares the SQL query
 	 * @param sql - The SQL query desired
-	 * @return A PreparedStatement of that SQL Query
-	 */
-	PreparedStatement prepareStatement(String sql) {
-		return prepare(sql, PreparedStatement.class);
-	}
-	
-	/**
-	 * Creates the SQL connection and prepares the SQL query
-	 * @param sql - The SQL query desired
 	 * @return A CallableStatement of that SQL Query
 	 */
-	CallableStatement prepareCallable(String sql) {
-		return prepare(sql, CallableStatement.class);
+	CallableStatement prepareCall(String sql) {
+		Connection conn = ConnectionUtil.getConnection();
+		try {
+			return conn.prepareCall(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	/**

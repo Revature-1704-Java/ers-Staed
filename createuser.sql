@@ -1,6 +1,6 @@
 -- Run this file first from SYSTEM user
 
-DROP USER ers;
+DROP USER ers CASCADE;
 
 CREATE USER ers
 IDENTIFIED BY baconandeggs
@@ -14,6 +14,6 @@ GRANT CREATE SESSION TO ers;
 GRANT CREATE TABLE TO ers;
 GRANT CREATE VIEW TO ers;
 
-GRANT EXECUTE ON SYS.DBMS_CRYPTO TO ers;
+--GRANT EXECUTE ON SYS.DBMS_CRYPTO TO ers;
 
 conn ers/baconandeggs

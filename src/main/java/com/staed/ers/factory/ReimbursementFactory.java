@@ -6,7 +6,7 @@ import com.staed.ers.beans.Reimbursement;
 
 public class ReimbursementFactory {
 	public Reimbursement getReimbursement(int id, int eId, int hId,
-			Date sDate, Date rDate, String desc, int amt, boolean appro ) {
+			Date sDate, Date rDate, String desc, float amt, boolean appro ) {
 		return new Reimbursement(id, eId, hId, sDate, rDate, desc, amt, appro);
 	}
 }

@@ -15,22 +15,10 @@ public class App {
 	}
 
 	public static void main(String[] args) {
-		/*System.out.print("All: ");
-		System.out.println(app.getEmployeeDAO().getAllEmployee());
-		
-		System.out.print("\nSingle: ");
-		System.out.println(app.getEmployeeDAO().getEmployee(2));
-		
-		System.out.print("\nAll Reimbursement: ");
-		System.out.println(app.getReimbursementDAO().getAllReimbursement());
-		
-		System.out.print("\nSingle: ");
-		System.out.println(app.getReimbursementDAO().getReimbursement(1));*/
-		
 		App app = new App();
 		
 		String buffer;
-		app.printWelcomeText();
+		System.out.println(app.welcomeText());
 		
 		do {
 			buffer = app.getNextLine();
@@ -44,18 +32,22 @@ public class App {
 				case "logout":
 					app.getService().logout();
 					break;
+				case "submit":
+					app.request();
+					break;
 				case "quit":
+					System.out.println("Goodbye.");
 					return;
 				default:
+					System.out.print("\nCommand was not recognized.");
 					break;
 			}
 			System.out.println("\nWhat is your next command?");
 		} while(!buffer.equals("quit"));
 	}
 	
-	public void printWelcomeText() {
-		System.out.println("Welcome to the Employee Reimbursement System");
-		System.out.println("What would you like to do?");
+	public String welcomeText() {
+		return "Welcome to the Employee Reimbursement System\nWhat would you like to do?";
 	}
 	
 	public String getNextLine() {
@@ -73,7 +65,31 @@ public class App {
 		String pass = getNextLine();
 		
 		service.login(user, pass);
-		//service.login("doge2018", "#notmydog");
+	}
+	
+	public void request() {
+		if (!service.loggedIn()) {
+			System.out.println("You need to be logged in to submit a reimbursement request.");
+		} else {
+			String dateString = null;
+			System.out.println("Enter the date of the event you want reimbursement for.");
+			do {
+				System.out.println("Use the yyyy-MM-dd format.");
+				dateString = getNextLine();
+			} while (!dateString.matches("\\d\\d\\d\\d-[01]\\d-(([012]\\d)|(3[01]))"));
+			
+			System.out.println("Enter a description for the request.");
+			String desc = getNextLine();
+			
+			System.out.println("Enter the amount to be reimbursed.");
+			String amtString = getNextLine();
+			while (!amtString.matches("\\d+(\\.\\d\\d?)?")) {
+				System.out.println("Please use the XXX or X.XX style formats.");
+				amtString = getNextLine();
+			}
+			float amount = Float.parseFloat(amtString);
+			service.request(dateString, desc, amount);
+		}
 	}
 
 }

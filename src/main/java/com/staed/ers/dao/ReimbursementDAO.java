@@ -1,9 +1,11 @@
 package com.staed.ers.dao;
 
+import java.sql.CallableStatement;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 import com.staed.ers.beans.Reimbursement;
 import com.staed.ers.factory.ReimbursementFactory;
@@ -42,6 +44,59 @@ public class ReimbursementDAO extends DAO {
 		}
 		List<Reimbursement> res = resultIterator(ps);
 		return res.isEmpty() ? null : res.get(0);
+	}
+	
+	public int addReimbursement(int eId, int hId, Date rDate, String desc, float amt) {
+		String sql = "INSERT INTO REIMBURSEMENT(EMPLOYEEID, HANDLERID, "
+				+ "REQUESTDATE, DESCRIPTION, AMOUNT) VALUES (?, ?, ?, ?, ?)";
+		PreparedStatement ps = prepareStatement(sql);
+		int ans = 0;
+		try {
+			ps.setInt(1, eId);
+			ps.setInt(2, hId);
+			ps.setDate(3, rDate);
+			ps.setString(4, desc);
+			ps.setFloat(5, amt);
+			ans = ps.executeUpdate();
+		} catch (SQLException e) {
+			e.getMessage();
+		}
+		return ans;
+	}
+	
+	public int _deleteReimbursement(int eId, float amt) {
+		String sql = "SELECT * FROM REIMBURSEMENT WHERE EMPLOYEEID = ? AND AMOUNT = ?";
+		PreparedStatement ps = prepareStatement(sql);
+		ResultSet rs = null;
+		Reimbursement reimb = null;
+		try {
+			ps.setInt(1, eId);
+			ps.setFloat(2, amt);
+			rs = ps.executeQuery();
+			while(rs.next()) {
+				reimb = extractRow(rs);
+			}
+		} catch (SQLException e) {
+			e.getMessage();
+		}
+		System.out.println(reimb);
+		if (reimb == null)
+			return 0;
+		int rId = reimb.getId();
+		
+		CallableStatement cs = prepareCall("{? = call DELETE_REIMBURSEMENT (?)}");
+		int ans = 0;
+		try {
+			cs.registerOutParameter(1, Types.INTEGER);
+			cs.setInt(2, rId);
+			cs.execute();
+			ans = cs.getInt(1);
+			
+			cs.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return ans;
 	}
 
 	@SuppressWarnings("unchecked")

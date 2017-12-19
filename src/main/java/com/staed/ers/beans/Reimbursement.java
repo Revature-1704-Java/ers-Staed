@@ -9,11 +9,11 @@ public class Reimbursement {
 	private Date submissionDate;
 	private Date requestDate;
 	private String description;
-	private int amount;
+	private float amount;
 	boolean approved;
 	
 	public Reimbursement(int id, int employeeId, int handlerId, Date submissionDate, Date requestDate,
-			String description, int amount, boolean approved) {
+			String description, float amount, boolean approved) {
 		this.id = id;
 		this.employeeId = employeeId;
 		this.handlerId = handlerId;
@@ -67,7 +67,7 @@ public class Reimbursement {
 		this.description = description;
 	}
 	
-	public int getAmount() {
+	public float getAmount() {
 		return amount;
 	}
 	
