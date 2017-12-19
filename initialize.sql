@@ -1,11 +1,15 @@
 -- Run this file after createuser.sql
+CREATE OR REPLACE PACKAGE hashkey IS
+    salt RAW(32) := '5C5FE365448BA485C5FB2B359CBCCE9F747E2AB6239AEB16B1BC65D703AF2B54';
+END;
+/
 
 CREATE TABLE EMPLOYEE (
     EmployeeId NUMBER NOT NULL UNIQUE,
     FirstName VARCHAR2(20),
     LastName VARCHAR2(20),
     Username VARCHAR2(20) NOT NULL UNIQUE,
-    Pass VARCHAR2(200) NOT NULL,
+    Pass VARCHAR2(30) NOT NULL,
     SuperId NUMBER,
     IsManager NUMBER(1) DEFAULT 0,
     CONSTRAINT PK_EmployeeId PRIMARY KEY (EmployeeId),
@@ -29,23 +33,30 @@ CREATE TABLE REIMBURSEMENT (
     CONSTRAINT BOOL_Approved CHECK (Approved >= 0)
 );
 
+--CREATE OR REPLACE FUNCTION ENCRYPT_PASS (Pass VARCHAR2)
+--RETURN RAW IS encryptedRaw RAW(200);
+--    encryptionType PLS_INTEGER;
+--BEGIN
+--    encryptionType := 
+--        DBMS_CRYPTO.ENCRYPT_AES256 +
+--        DBMS_CRYPTO.CHAIN_CBC +
+--        DBMS_CRYPTO.PAD_PKCS5;
+--        
+--    encryptedRaw := DBMS_CRYPTO.ENCRYPT(
+--        src => UTL_I18N.STRING_TO_RAW (Pass, 'AL32UTF8'),
+--        typ => encryptionType,
+--        key => hashkey.salt
+--    );
+--    return encryptedRaw;
+--END;
+--/
+
 CREATE OR REPLACE TRIGGER TR_EMPLOYEE_INSERT
 BEFORE INSERT ON EMPLOYEE
 FOR EACH ROW
-DECLARE
-    encryptedRaw RAW(200);
-    encryptionType PLS_INTEGER := 
-        DBMS_CRYPTO.ENCRYPT_AES256 +
-        DBMS_CRYPTO.CHAIN_CBC +
-        DBMS_CRYPTO.PAD_PKCS5;
 BEGIN
-    encryptedRaw := DBMS_CRYPTO.ENCRYPT(
-        src => UTL_I18N.STRING_TO_RAW (:NEW.Pass, 'AL32UTF8'),
-        typ => encryptionType,
-        key => DBMS_CRYPTO.RANDOMBYTES (32)
-    );
-    DBMS_OUTPUT.PUT_LINE ('Encrypted String: ' || encryptedRaw);
-    :NEW.Pass := utl_raw.cast_to_varchar2(encryptedRaw);
+    --:NEW.Pass := ENCRYPT_PASS(:NEW.Pass);
+    --DBMS_OUTPUT.PUT_LINE ('Encrypted String: ' || :NEW.Pass);
     
     SELECT SQ_EMPLOYEEID.NEXTVAL
     INTO :NEW.EmployeeId FROM DUAL;
@@ -61,6 +72,9 @@ BEGIN
 END;
 /
 
+DELETE FROM REIMBURSEMENT;
+DELETE FROM EMPLOYEE;
+
 DROP SEQUENCE SQ_EMPLOYEEID;
 DROP SEQUENCE SQ_REIMBURSEMENTID;
 
@@ -73,13 +87,16 @@ START WITH 1
 INCREMENT BY 1;
 
 INSERT INTO EMPLOYEE(FirstName, LastName, Username, Pass, SuperId)
-    VALUES ('Doggy', 'McDogFace', 'doge2018','#notmydog', null);
+    VALUES ('Doggy', 'McDogFace', 'doge2018', '#notmydog', 1);
 
 INSERT INTO EMPLOYEE(FirstName, LastName, Username, Pass, SuperId)
-    VALUES ('Ronald', 'McDonald', 'mickeyds', '#notmydog', null);
+    VALUES ('Ronald', 'McDonald', 'mickeyds', '#imlovingit', null);
+
     
 INSERT INTO REIMBURSEMENT(EMPLOYEEID, HANDLERID, SUBMISSIONDATE, REQUESTDATE, DESCRIPTION, AMOUNT)
     VALUES (2, 1, SYSDATE, SYSDATE + 14,'Dance Off', 10.5);
     
 INSERT INTO REIMBURSEMENT(EMPLOYEEID, HANDLERID, SUBMISSIONDATE, REQUESTDATE, DESCRIPTION, AMOUNT)
     VALUES (1, 1, SYSDATE, SYSDATE + 7,'Penny wise pound foolish', 0.01);
+
+COMMIT;

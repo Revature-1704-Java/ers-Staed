@@ -1,64 +1,56 @@
 package com.staed.ers.dao;
 
-import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import com.staed.ers.ConnectionUtil;
 import com.staed.ers.beans.Reimbursement;
 import com.staed.ers.factory.ReimbursementFactory;
 
-public class ReimbursementDAO {
+public class ReimbursementDAO extends DAO {
 	public List<Reimbursement> getAllReimbursement() {
 		String sql = "SELECT * FROM REIMBURSEMENT";
-		return resultIterator(prepareStatement(sql));
+		PreparedStatement ps = prepareStatement(sql);
+		List<Reimbursement> res = resultIterator(ps);
+		try {
+			ps.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
+	
+	public List<Reimbursement> getEmployeesReimbursements(int id) {
+		String sql = "SELECT * FROM REIMBURSEMENT WHERE EMPLOYEEID = ?";
+		PreparedStatement ps = prepareStatement(sql);
+		try {
+			ps.setInt(1, id);
+		} catch (SQLException e) {
+			e.getMessage();
+		}
+		return resultIterator(ps);
 	}
 
 	public Reimbursement getReimbursement(int id) {
-		Reimbursement reimb = null;
-
 		String sql = "SELECT * FROM REIMBURSEMENT WHERE REIMBURSEMENTID = ?";
 		PreparedStatement ps = prepareStatement(sql);
 		try {
 			ps.setInt(1, id);
-			reimb = resultIterator(ps).get(0);
 		} catch (SQLException e) {
 			e.getMessage();
 		}
-		return reimb;
+		List<Reimbursement> res = resultIterator(ps);
+		return res.isEmpty() ? null : res.get(0);
 	}
 
+	@SuppressWarnings("unchecked")
+	List<Reimbursement> resultIterator(PreparedStatement ps) {
+		return super.resultIterator(ps);
+	}
 	
-	// Helper functions to hide as much implementation as possible in the GET statements
-	private List<Reimbursement> resultIterator(PreparedStatement ps) {
-		List<Reimbursement> reimbs = new ArrayList<>();
-		try {
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				reimbs.add(extractReimbursement(rs));
-			}
-			rs.close();
-			ps.close();
-		} catch (SQLException e) {
-			e.getMessage();
-		}
-		return reimbs;
-	}
-
-	private PreparedStatement prepareStatement(String sql) {
-		Connection conn = ConnectionUtil.getConnection();
-		try {
-			return conn.prepareStatement(sql);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	private Reimbursement extractReimbursement(ResultSet rs) {
+	@SuppressWarnings("unchecked")
+	Reimbursement extractRow(ResultSet rs) {
 		try {
 			ReimbursementFactory rf = new ReimbursementFactory();
 
@@ -75,7 +67,7 @@ public class ReimbursementDAO {
 				appro = true;
 
 			return rf.getReimbursement(id, eId, hId, submission, request, desc, amt, appro);
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.getMessage();
 			return null;
 		}
