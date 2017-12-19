@@ -24,7 +24,7 @@ class ReimbursementDAOTest {
 		empDAO = new EmployeeDAO();
 	}
 	
-	@DisplayName("ReimbursementDAO: getAll")
+	@DisplayName("ReimbursementDAO: Get All Reimbursements")
 	@Test
 	void getAllReimbursementTest() {
 		List<Reimbursement> reimbs = reimbDAO.getAllReimbursement();
@@ -32,12 +32,20 @@ class ReimbursementDAOTest {
 		assertTrue(reimbs.size() > 0);
 	}
 	
-	@DisplayName("ReimbursementDAO: getOne")
+	@DisplayName("ReimbursementDAO: Get Specific Reimbursement")
 	@Test
 	void getReimbursementTest() {
 		Reimbursement reimb = reimbDAO.getReimbursement(1);
 		assertNotNull(reimb);
 		assertEquals(1, reimb.getId());
+	}
+	
+	@DisplayName("ReimbursementDAO: Employee's Reimbursements")
+	@Test
+	void employeeReimbursementTest() {
+		List<Reimbursement> reimbs = reimbDAO.getEmployeesReimbursements(1);
+		assertNotNull(reimbs);
+		assertEquals(1, reimbs.get(0).getEmployeeId());
 	}
 	
 	@DisplayName("ReimbursementDAO: Insert and Delete")
@@ -51,7 +59,6 @@ class ReimbursementDAOTest {
 		assertTrue(addRes > 0);
 		
 		int res = reimbDAO._deleteReimbursement(emp.getId(), 2);
-		System.out.println("Is: " + res);
 		assertTrue(res > 0);
 	}
 }

@@ -61,4 +61,11 @@ class ServiceTest {
 		service.login("doge2018", "#notmydog");
 		assertTrue(service.viewAll());
 	}
+	
+	@DisplayName("Service: Add Request")
+	@Test
+	void serviceAddTest() {
+		service.login("doge2018", "#notmydog");
+		assertTrue(service.request("2020-12-19", "Test Service", (float) 0.01));
+	}
 }
