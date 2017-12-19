@@ -60,7 +60,7 @@ public class Employee {
 
 	@Override
 	public String toString() {
-		return "{id:" + id + ", firstName:" + firstName + ", lastName:" +
+		return "Employee: {id:" + id + ", firstName:" + firstName + ", lastName:" +
 				lastName + ", username:" + username + ", super:" + superId +
 				", manager:" + isManager + "}";
 	}
